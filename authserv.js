@@ -1,6 +1,6 @@
 const fs = require("fs");
 const crypto = require("crypto");
-const { exec } = require("child_process");
+const { execFile } = require("child_process");
 const sqlite3 = require("sqlite3").verbose();
 
 const API_KEY = process.env.STRIPE_ACCESS_TOKEN;
@@ -11,8 +11,8 @@ const db = new sqlite3.Database(DB_PATH);
 
 function login(username, password) {
     return new Promise((resolve, reject) => {
-        const query = "SELECT * FROM users WHERE username = ?";
-        db.get(query, [username], (err, row) => {
+        const query = "SELECT * FROM users WHERE username = $username";
+        db.get(query, {$username: username}, (err, row) => {
             if (err) {
                 reject(err);
             } else if (row) {
@@ -42,21 +42,33 @@ function verifyPassword(storedPassword, providedPassword) {
 
 function executeCommand(allowedCommands, command) {
     if (allowedCommands.includes(command)) {
-        const childProcess = require('child_process');
-        childProcess.execFile(command.split(' ')[0], command.split(' ').slice(1), (err, stdout, stderr) => {
-            if (err) {
-                console.log(err);
-                return;
-            }
-            console.log(stdout);
-        });
+        const commandParts = command.split(' ');
+        const commandName = commandParts[0];
+        const args = commandParts.slice(1);
+        try {
+            const childProcess = require('child_process');
+            childProcess.execFile(commandName, args, (err, stdout, stderr) => {
+                if (err) {
+                    console.log(err);
+                    return;
+                }
+                console.log(stdout);
+            });
+        } catch (err) {
+            console.log(err);
+        }
     } else {
         console.log("Command not allowed");
     }
 }
 
 function readConfig(path) {
-    return fs.readFileSync(path, 'utf8');
+    try {
+        return fs.readFileSync(path, 'utf8');
+    } catch (err) {
+        console.log(err);
+        return null;
+    }
 }
 
 function authenticate(user) {
