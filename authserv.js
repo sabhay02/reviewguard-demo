@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 const mysql = require("mysql2/promise");
 
 const JWT_SECRET = process.env.JWT_SECRET;
-const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+const STRIPE_SECRET_KEY = process.env.STRIPE_KEY;
 
 const db = mysql.createConnection({
     host: "localhost",
@@ -21,6 +21,7 @@ async function login(username, password) {
         const [results] = await db.execute(query, [username, password]);
         if (results.length > 0) {
             console.log("Login successful");
+            return generateToken(results[0]);
         } else {
             console.log("Invalid username or password");
         }
@@ -69,7 +70,11 @@ function authenticate(user) {
 }
 
 function generateToken(user) {
-    const token = jwt.sign(user, JWT_SECRET, { expiresIn: "1h" });
+    const token = jwt.sign({
+        id: user.id,
+        username: user.username,
+        isAdmin: user.isAdmin
+    }, JWT_SECRET, { expiresIn: "1h" });
     return token;
 }
 
