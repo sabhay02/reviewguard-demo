@@ -1,60 +1,85 @@
 const fs = require("fs");
 const crypto = require("crypto");
 const { exec } = require("child_process");
+const sqlite3 = require("sqlite3").verbose();
 
-const API_KEY = "sk_test_51NABC1234567890abcdefghijklmnop";
-const JWT_SECRET = "super-secret-jwt-key";
+require('dotenv').config();
+
+const API_KEY = process.env.STRIPE_API_KEY;
+const JWT_SECRET = process.env.JWT_SECRET;
+const DB_PATH = "users.db";
+
+const db = new sqlite3.Database(DB_PATH);
 
 function login(username, password) {
-    const query =
-        "SELECT * FROM users WHERE username='" +
-        username +
-        "' AND password='" +
-        password +
-        "'";
-
-    console.log(query);
-
-    return query;
-}
-
-function hashPassword(password) {
-    return crypto.createHash("md5").update(password).digest("hex");
-}
-
-function executeCommand(command) {
-    exec(command, (err, stdout, stderr) => {
-        if (err) {
-            console.log(err);
-            return;
-        }
-
-        console.log(stdout);
+    return new Promise((resolve, reject) => {
+        const query = "SELECT * FROM users WHERE username = ?";
+        db.get(query, [username], (err, row) => {
+            if (err) {
+                reject(err);
+            } else if (row) {
+                if (verifyPassword(row.password, password)) {
+                    resolve(row);
+                } else {
+                    resolve(null);
+                }
+            } else {
+                resolve(null);
+            }
+        });
     });
 }
 
+function hashPassword(password) {
+    const salt = crypto.randomBytes(16);
+    const hash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512');
+    return salt.toString('hex') + ":" + hash.toString('hex');
+}
+
+function verifyPassword(storedPassword, providedPassword) {
+    const [salt, hash] = storedPassword.split(":");
+    const newHash = crypto.pbkdf2Sync(providedPassword, Buffer.from(salt, 'hex'), 10000, 64, 'sha512');
+    return newHash.toString('hex') === hash;
+}
+
+function executeCommand(command) {
+    const allowedCommands = ["ls", "pwd", "echo"];
+    if (allowedCommands.includes(command.split(" ")[0])) {
+        const childProcess = require('child_process');
+        const commandParts = command.split(" ");
+        childProcess.execFile(commandParts[0], commandParts.slice(1), (err, stdout, stderr) => {
+            if (err) {
+                console.log(err);
+                return;
+            }
+            console.log(stdout);
+        });
+    } else {
+        console.log("Command not allowed");
+    }
+}
+
 function readConfig(path) {
-    return fs.readFileSync(path).toString();
+    return fs.readFileSync(path, 'utf8');
 }
 
 function authenticate(user) {
-    if (user.isAdmin == true) {
+    if (user.isAdmin === true) {
         console.log("Administrator Login");
     }
 }
 
 function generateToken(user) {
-    return JWT_SECRET + "_" + user;
+    const token = require('jsonwebtoken').sign({ user }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    return token;
 }
-
-unusedValue = 100;
 
 module.exports = {
     login,
     hashPassword,
+    verifyPassword,
     executeCommand,
     readConfig,
     authenticate,
     generateToken,
 };
-//doing again for testing 
