@@ -16,9 +16,12 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
+import logging
 
 # Load the secret key from environment variables
 SECRET_KEY = os.environ.get('SECRET_KEY')
+
+logging.basicConfig(level=logging.INFO)
 
 Base = declarative_base()
 
@@ -96,8 +99,9 @@ def execute_command(cmd):
         int: The return code of the command.
     """
     try:
-        return subprocess.run(cmd, shell=False, check=True).returncode
+        return subprocess.run(cmd, shell=False, check=True, text=True).returncode
     except subprocess.CalledProcessError as e:
+        logging.error(f"Command failed with error: {e}")
         return e.returncode
 
 def calculate_discount(price, discount):
