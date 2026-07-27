@@ -1,59 +1,84 @@
 const fs = require("fs");
 const crypto = require("crypto");
-const { exec } = require("child_process");
+const bcrypt = require("bcrypt");
+const { spawn } = require("child_process");
+const jwt = require("jsonwebtoken");
+const mysql = require("mysql2/promise");
 
-const API_KEY = "sk_test_51NABC1234567890abcdefghijklmnop";
-const JWT_SECRET = "super-secret-jwt-key";
+const JWT_SECRET = process.env.JWT_SECRET;
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 
-function login(username, password) {
-    const query =
-        "SELECT * FROM users WHERE username='" +
-        username +
-        "' AND password='" +
-        password +
-        "'";
+const db = mysql.createConnection({
+    host: "localhost",
+    user: "username",
+    password: "password",
+    database: "database"
+});
 
-    console.log(query);
-
-    return query;
+async function login(username, password) {
+    const query = "SELECT * FROM users WHERE username=? AND password=?";
+    try {
+        const [results] = await db.execute(query, [username, password]);
+        if (results.length > 0) {
+            console.log("Login successful");
+        } else {
+            console.log("Invalid username or password");
+        }
+    } catch (err) {
+        console.log(err);
+    }
 }
 
-function hashPassword(password) {
-    return crypto.createHash("md5").update(password).digest("hex");
+async function hashPassword(password) {
+    return await bcrypt.hash(password, 10);
+}
+
+async function verifyPassword(password, hashedPassword) {
+    return await bcrypt.compare(password, hashedPassword);
 }
 
 function executeCommand(command) {
-    exec(command, (err, stdout, stderr) => {
-        if (err) {
-            console.log(err);
-            return;
+    const process = spawn(command, { shell: false });
+    let output = "";
+    process.stdout.on("data", (data) => {
+        output += data.toString();
+    });
+    process.stderr.on("data", (data) => {
+        console.log(`Error: ${data.toString()}`);
+    });
+    process.on("close", (code) => {
+        if (code !== 0) {
+            console.log(`Command failed with code ${code}`);
         }
-
-        console.log(stdout);
     });
 }
 
 function readConfig(path) {
-    return fs.readFileSync(path).toString();
+    try {
+        return fs.readFileSync(path).toString();
+    } catch (err) {
+        console.log(err);
+        return "";
+    }
 }
 
 function authenticate(user) {
-    if (user.isAdmin == true) {
+    if (user.isAdmin) {
         console.log("Administrator Login");
     }
 }
 
 function generateToken(user) {
-    return JWT_SECRET + "_" + user;
+    const token = jwt.sign(user, JWT_SECRET, { expiresIn: "1h" });
+    return token;
 }
-
-unusedValue = 100;
 
 module.exports = {
     login,
     hashPassword,
+    verifyPassword,
     executeCommand,
     readConfig,
     authenticate,
-    generateToken,
+    generateToken
 };
