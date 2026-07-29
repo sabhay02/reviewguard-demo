@@ -1,13 +1,13 @@
 [
  {
   "Description": "Identified a pattern that may indicate AWS credentials, risking unauthorized cloud resource access and data breaches on AWS platforms.",
-  "StartLine": 5,
-  "EndLine": 5,
-  "StartColumn": 26,
-  "EndColumn": 45,
+  "StartLine": 8,
+  "EndLine": 8,
+  "StartColumn": 14,
+  "EndColumn": 33,
   "Match": "AKIAIOSFODNN7EXAMPLE",
   "Secret": "AKIAIOSFODNN7EXAMPLE",
-  "File": "server.js",
+  "File": "-",
   "SymlinkFile": "",
   "Commit": "",
   "Entropy": 3.6841838,
@@ -17,6 +17,26 @@
   "Message": "",
   "Tags": [],
   "RuleID": "aws-access-token",
-  "Fingerprint": "server.js:aws-access-token:5"
+  "Fingerprint": "-:aws-access-token:8"
+ },
+ {
+  "Description": "Identified a pattern that may indicate AWS credentials, risking unauthorized cloud resource access and data breaches on AWS platforms.",
+  "StartLine": 9,
+  "EndLine": 9,
+  "StartColumn": 15,
+  "EndColumn": 34,
+  "Match": "AKIAIOSFODNN7EXAMPLE",
+  "Secret": "AKIAIOSFODNN7EXAMPLE",
+  "File": "-",
+  "SymlinkFile": "",
+  "Commit": "",
+  "Entropy": 3.6841838,
+  "Author": "",
+  "Email": "",
+  "Date": "",
+  "Message": "",
+  "Tags": [],
+  "RuleID": "aws-access-token",
+  "Fingerprint": "-:aws-access-token:9"
  }
 ]
