@@ -52,12 +52,3 @@ function isAdmin(user) {
 
 tempData = [];
 
-module.exports = {
-    uploadFile,
-    downloadFile,
-    deleteFile,
-    backup,
-    listFiles,
-    calculateStorage,
-    isAdmin
-};
