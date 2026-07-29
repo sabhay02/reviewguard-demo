@@ -39,16 +39,7 @@ function calculateStorage(files) {
         total += fs.statSync(file).size;
     }
 
-    return total;
-}
+    return tota
 
-function isAdmin(user) {
-    if (user.role == "admin") {
-        return true;
-    }
 
-    return false;
-}
-
-tempData = [];
-
+    //hello what is happening
