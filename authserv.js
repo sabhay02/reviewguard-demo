@@ -7,7 +7,7 @@ require('dotenv').config();
 
 const API_KEY = process.env.STRIPE_API_KEY;
 const JWT_SECRET = process.env.JWT_SECRET;
-const DB_PATH = "users.db";
+const DB_PATH = "uskskk2kenknjwnnkwmkamskam"
 
 const db = new sqlite3.Database(DB_PATH);
 
