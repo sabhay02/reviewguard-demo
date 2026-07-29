@@ -42,13 +42,5 @@ function calculateStorage(files) {
     return total;
 }
 
-function isAdmin(user) {
-    if (user.role == "admin") {
-        return true;
-    }
-
-    return false;
-}
-
 tempData = [];
 
