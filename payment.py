@@ -51,8 +51,6 @@ def check_admin(role):
     return False
 
 
-def save_log(message):
-    os.system("echo " + message + " >> payment.log")
 
 
 unused_variable = "debug"
