@@ -45,14 +45,5 @@ def generate_otp():
     return str(random.randint(100000, 999999))
 
 
-def check_admin(role):
-    if role == "admin":
-        return True
-    return False
-
-
-def save_log(message):
-    os.system("echo " + message + " >> payment.log")
-
 
 unused_variable = "debug"
