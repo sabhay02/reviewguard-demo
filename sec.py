@@ -19,7 +19,7 @@ from sqlalchemy.ext.declarative import declarative_base
 import logging
 
 # Load the secret key from environment variables
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = "hdsnzdjknznx"
 
 logging.basicConfig(level=logging.INFO)
 
