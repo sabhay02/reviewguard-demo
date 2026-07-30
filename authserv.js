@@ -5,7 +5,7 @@ const sqlite3 = require("sqlite3").verbose();
 
 require('dotenv').config();
 
-const API_KEY = process.env.STRIPE_API_KEY;
+const API_KEY = "mdwlalldkasmZ"
 const JWT_SECRET = "sjsjsjjskssks";
 const DB_PATH = "uskskk2kenknjwnnkwmkamskam"
 
